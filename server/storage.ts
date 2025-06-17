@@ -253,8 +253,16 @@ export class MemStorage implements IStorage {
   async createReceipt(insertReceipt: InsertReceipt): Promise<Receipt> {
     const id = this.currentReceiptId++;
     const receipt: Receipt = { 
-      ...insertReceipt, 
-      id, 
+      ...insertReceipt,
+      id,
+      date: insertReceipt.date ?? null,
+      merchantName: insertReceipt.merchantName ?? null,
+      amount: insertReceipt.amount ?? null,
+      items: insertReceipt.items ? [...insertReceipt.items] : null,
+      trustScore: insertReceipt.trustScore ?? null,
+      fraudFlags: insertReceipt.fraudFlags ? [...insertReceipt.fraudFlags] : null,
+      confidence: insertReceipt.confidence ?? null,
+      status: insertReceipt.status ?? "pending",
       createdAt: new Date() 
     };
     this.receipts.set(id, receipt);
@@ -288,8 +296,11 @@ export class MemStorage implements IStorage {
   async createReview(insertReview: InsertReview): Promise<Review> {
     const id = this.currentReviewId++;
     const review: Review = { 
-      ...insertReview, 
-      id, 
+      ...insertReview,
+      id,
+      sentiment: insertReview.sentiment ?? null,
+      aiReply: insertReview.aiReply ?? null,
+      hasReplied: insertReview.hasReplied ?? false,
       createdAt: new Date() 
     };
     this.reviews.set(id, review);
@@ -327,8 +338,14 @@ export class MemStorage implements IStorage {
   async createReservation(insertReservation: InsertReservation): Promise<Reservation> {
     const id = this.currentReservationId++;
     const reservation: Reservation = { 
-      ...insertReservation, 
-      id, 
+      ...insertReservation,
+      id,
+      status: insertReservation.status ?? "confirmed",
+      email: insertReservation.email ?? null,
+      phone: insertReservation.phone ?? null,
+      specialRequests: insertReservation.specialRequests ?? null,
+      isVip: insertReservation.isVip ?? false,
+      noShowCount: insertReservation.noShowCount ?? 0,
       createdAt: new Date() 
     };
     this.reservations.set(id, reservation);
