@@ -54,7 +54,7 @@ export default function AIInsights() {
   const reviewsNeedingReply = reviews?.filter(r => !r.hasReplied) || [];
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 max-h-[800px] overflow-y-auto">
       {/* Weekly Summary */}
       <Card className="border border-gray-100">
         <CardHeader className="border-b border-gray-100">
@@ -96,7 +96,7 @@ export default function AIInsights() {
             )}
           </div>
         </CardHeader>
-        <CardContent className="p-6 space-y-4">
+        <CardContent className="p-6 space-y-4 max-h-96 overflow-y-auto">
           {reviews && reviews.length > 0 ? (
             reviews.slice(0, 2).map((review) => (
               <div key={review.id} className="border border-gray-200 rounded-lg p-4">
@@ -186,13 +186,13 @@ export default function AIInsights() {
                         VIP Guest
                       </Badge>
                     )}
-                    {reservation.noShowCount > 0 && (
+                    {(reservation.noShowCount ?? 0) > 0 && (
                       <Badge variant="outline" className="bg-yellow-50 text-yellow-700 border-yellow-200">
                         <Flag className="mr-1 w-3 h-3" />
                         Previous No-Show
                       </Badge>
                     )}
-                    {!reservation.isVip && reservation.noShowCount === 0 && (
+                    {!reservation.isVip && (reservation.noShowCount ?? 0) === 0 && (
                       <Badge className="bg-green-100 text-green-700">
                         Confirmed
                       </Badge>
