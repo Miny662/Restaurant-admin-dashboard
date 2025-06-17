@@ -373,8 +373,9 @@ export class MemStorage implements IStorage {
   async createResponseTemplate(insertTemplate: InsertResponseTemplate): Promise<ResponseTemplate> {
     const id = this.currentTemplateId++;
     const template: ResponseTemplate = { 
-      ...insertTemplate, 
-      id, 
+      ...insertTemplate,
+      id,
+      isActive: insertTemplate.isActive ?? true,
       createdAt: new Date() 
     };
     this.responseTemplates.set(id, template);
