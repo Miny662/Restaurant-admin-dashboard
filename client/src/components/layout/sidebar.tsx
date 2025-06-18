@@ -1,6 +1,7 @@
 import { Link, useLocation } from "wouter";
 import { cn } from "@/lib/utils";
 import { Heart, BarChart3, Receipt, Star, Calendar, ChartLine, Settings } from "lucide-react";
+import logo from "../assets/logo.png";
 
 const navigation = [
   { name: "Dashboard", href: "/", icon: BarChart3 },
@@ -18,7 +19,7 @@ export default function Sidebar() {
     <div className="w-64 bg-white shadow-lg border-r border-gray-200">
       <div className="p-6">
         <div className="flex items-center space-x-2">
-          <img src="/src/assets/logo.png" alt="logo" className="w-[50xp] h-[50px]"/>
+          <img src={logo} alt="logo" className="w-[50px] h-[50px]"/>
           <span className="text-xl font-bold text-gray-900">Albert Restaurant</span>
         </div>
       </div>
