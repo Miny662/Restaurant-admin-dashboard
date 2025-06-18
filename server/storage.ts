@@ -61,10 +61,10 @@ export class DatabaseStorage implements IStorage {
           originalName: "starbucks_receipt.jpg",
           merchantName: "Starbucks - Downtown",
           amount: 12.45,
-          date: new Date(Date.now() - 2 * 60 * 60 * 1000), // 2 hours ago
-          items: ["Grande Latte", "Blueberry Muffin"],
+          date: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(), // 2 hours ago
+          items: JSON.stringify(["Grande Latte", "Blueberry Muffin"]),
           trustScore: 0.98,
-          fraudFlags: [],
+          fraudFlags: JSON.stringify([]),
           confidence: 0.98,
           status: "verified",
         },
@@ -73,10 +73,10 @@ export class DatabaseStorage implements IStorage {
           originalName: "luigi_receipt.jpg",
           merchantName: "Luigi's Italian Bistro",
           amount: 87.23,
-          date: new Date(Date.now() - 5 * 60 * 60 * 1000), // 5 hours ago
-          items: ["Pasta Carbonara", "Caesar Salad", "Wine"],
+          date: new Date(Date.now() - 5 * 60 * 60 * 1000).toISOString(), // 5 hours ago
+          items: JSON.stringify(["Pasta Carbonara", "Caesar Salad", "Wine"]),
           trustScore: 0.85,
-          fraudFlags: ["unusual_amount_pattern"],
+          fraudFlags: JSON.stringify(["unusual_amount_pattern"]),
           confidence: 0.82,
           status: "flagged",
         },
@@ -85,10 +85,10 @@ export class DatabaseStorage implements IStorage {
           originalName: "mcdonalds_receipt.jpg",
           merchantName: "McDonald's",
           amount: 8.99,
-          date: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000), // 1 day ago
-          items: ["Big Mac Meal", "Apple Pie"],
+          date: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString(), // 1 day ago
+          items: JSON.stringify(["Big Mac Meal", "Apple Pie"]),
           trustScore: 0.92,
-          fraudFlags: [],
+          fraudFlags: JSON.stringify([]),
           confidence: 0.95,
           status: "verified",
         }
@@ -104,8 +104,7 @@ export class DatabaseStorage implements IStorage {
           content: "Great food and atmosphere! The service was a bit slow during peak hours, but the quality made up for it. Will definitely come back.",
           sentiment: "positive",
           aiReply: "Thank you so much for your wonderful review, Mike! We're thrilled you enjoyed the food and atmosphere. We appreciate your patience during our busy time and are working to improve our service speed. We can't wait to welcome you back soon!",
-          confidence: 0.95,
-          hasReplied: false,
+          hasReplied: 0, // false
         },
         {
           customerName: "Sarah L.",
@@ -113,8 +112,7 @@ export class DatabaseStorage implements IStorage {
           content: "Food was cold when it arrived and the waiter seemed disinterested. Expected much better for the price point.",
           sentiment: "negative",
           aiReply: "Thank you for bringing this to our attention, Sarah. We sincerely apologize for the cold food and service experience that didn't meet your expectations. We take food quality and service seriously and would love the opportunity to make this right. Please reach out to us directly so we can address your concerns properly.",
-          confidence: 0.88,
-          hasReplied: true,
+          hasReplied: 1, // true
         }
       ];
 
@@ -126,25 +124,25 @@ export class DatabaseStorage implements IStorage {
           customerName: "Johnson Party",
           email: "johnson@email.com",
           phone: "(555) 123-4567",
-          date: new Date(),
+          date: new Date().toISOString().split('T')[0], // YYYY-MM-DD format
           time: "7:00 PM",
           partySize: 4,
           status: "confirmed",
           specialRequests: "Window table preferred",
-          isVip: false,
-          noShowCount: null,
+          isVip: 0, // false
+          noShowCount: 0,
         },
         {
           customerName: "Smith Anniversary",
           email: "smith@email.com",
           phone: "(555) 987-6543",
-          date: new Date(),
+          date: new Date().toISOString().split('T')[0], // YYYY-MM-DD format
           time: "8:30 PM",
           partySize: 2,
           status: "confirmed",
           specialRequests: "Celebrating 25th anniversary",
-          isVip: true,
-          noShowCount: null,
+          isVip: 1, // true
+          noShowCount: 0,
         }
       ];
 
@@ -154,15 +152,15 @@ export class DatabaseStorage implements IStorage {
       const demoTemplates = [
         {
           name: "Booking Confirmation",
-          content: "Thank you for your reservation! We're excited to welcome you on [DATE] at [TIME] for [PARTY_SIZE] guests. Please let us know if you have any questions.",
+          template: "Thank you for your reservation! We're excited to welcome you on [DATE] at [TIME] for [PARTY_SIZE] guests. Please let us know if you have any questions.",
           category: "reservation",
-          isActive: true,
+          isActive: 1, // true
         },
         {
           name: "Positive Review Response",
-          content: "Thank you so much for your wonderful review! We're thrilled you had a great experience with us. We can't wait to welcome you back soon!",
+          template: "Thank you so much for your wonderful review! We're thrilled you had a great experience with us. We can't wait to welcome you back soon!",
           category: "review",
-          isActive: true,
+          isActive: 1, // true
         }
       ];
 
@@ -229,7 +227,7 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getReviewsNeedingReply(): Promise<Review[]> {
-    return await db.select().from(reviews).where(eq(reviews.hasReplied, false));
+    return await db.select().from(reviews).where(eq(reviews.hasReplied, 0));
   }
 
   async createReview(insertReview: InsertReview): Promise<Review> {
@@ -260,10 +258,7 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getTodayReservations(): Promise<Reservation[]> {
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    const tomorrow = new Date(today);
-    tomorrow.setDate(tomorrow.getDate() + 1);
+    const today = new Date().toISOString().split('T')[0]; // YYYY-MM-DD format
     
     return await db.select().from(reservations).where(eq(reservations.date, today));
   }

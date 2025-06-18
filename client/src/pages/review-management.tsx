@@ -10,10 +10,10 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Bot, Star, Plus, MessageSquare } from "lucide-react";
+import { Bot, Star, Plus, MessageSquare, Clock, CheckCircle, Send } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
-import { formatRelativeTime, getRatingStars } from "@/lib/utils";
+import { formatRelativeTime, getRatingStars, parseBoolean } from "@/lib/utils";
 import type { Review } from "@shared/schema";
 
 export default function ReviewManagement() {
@@ -102,7 +102,7 @@ export default function ReviewManagement() {
     }
   };
 
-  const reviewsNeedingReply = reviews?.filter(r => !r.hasReplied) || [];
+  const reviewsNeedingReply = reviews?.filter(r => !parseBoolean(r.hasReplied)) || [];
 
   return (
     <div className="flex h-screen bg-gray-50">
@@ -262,10 +262,10 @@ export default function ReviewManagement() {
                       
                       {review.aiReply && (
                         <div className={`rounded-lg p-4 mb-4 ${
-                          review.hasReplied ? 'bg-green-50 border border-green-200' : 'bg-blue-50 border border-blue-200'
+                          parseBoolean(review.hasReplied) ? 'bg-green-50 border border-green-200' : 'bg-blue-50 border border-blue-200'
                         }`}>
                           <div className="flex items-center mb-2">
-                            {review.hasReplied ? (
+                            {parseBoolean(review.hasReplied) ? (
                               <Badge className="bg-green-100 text-green-700">
                                 <Star className="mr-1 w-3 h-3" />
                                 Published Reply
@@ -281,7 +281,7 @@ export default function ReviewManagement() {
                         </div>
                       )}
                       
-                      {!review.hasReplied && (
+                      {!parseBoolean(review.hasReplied) && (
                         <div className="flex space-x-2">
                           <Button
                             size="sm"

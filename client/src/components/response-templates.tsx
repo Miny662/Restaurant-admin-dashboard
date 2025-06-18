@@ -8,9 +8,10 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Plus, Edit } from "lucide-react";
+import { Plus, Edit, Copy, CheckCircle } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
+import { parseBoolean } from "@/lib/utils";
 import type { ResponseTemplate } from "@shared/schema";
 
 export default function ResponseTemplates() {
@@ -76,7 +77,7 @@ export default function ResponseTemplates() {
       name: formData.get('name') as string,
       category: formData.get('category') as string,
       template: formData.get('template') as string,
-      isActive: true,
+      isActive: parseBoolean(formData.get('isActive') as string),
     };
 
     if (editingTemplate) {
@@ -112,7 +113,7 @@ export default function ResponseTemplates() {
                     <Badge className={getCategoryColor(template.category)}>
                       {template.category}
                     </Badge>
-                    {template.isActive && (
+                    {parseBoolean(template.isActive) && (
                       <Badge className="bg-green-100 text-green-800">Active</Badge>
                     )}
                   </div>

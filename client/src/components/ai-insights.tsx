@@ -5,7 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Bot, Star, ArrowRight, Calendar, Flag } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
-import { formatRelativeTime, getRatingStars } from "@/lib/utils";
+import { formatRelativeTime, getRatingStars, parseBoolean } from "@/lib/utils";
 import type { Review, Reservation } from "@shared/schema";
 
 interface WeeklySummary {
@@ -51,7 +51,7 @@ export default function AIInsights() {
     },
   });
 
-  const reviewsNeedingReply = reviews?.filter(r => !r.hasReplied) || [];
+  const reviewsNeedingReply = reviews?.filter(r => !parseBoolean(r.hasReplied)) || [];
 
   return (
     <div className="space-y-6 max-h-[800px] overflow-y-auto">
@@ -113,12 +113,12 @@ export default function AIInsights() {
                 
                 {review.aiReply && (
                   <div className={`rounded-lg p-3 mb-3 ${
-                    review.hasReplied ? 'bg-green-50' : 'bg-gray-50'
+                    parseBoolean(review.hasReplied) ? 'bg-green-50' : 'bg-gray-50'
                   }`}>
                     <p className={`text-xs mb-1 ${
-                      review.hasReplied ? 'text-green-600' : 'text-gray-600'
+                      parseBoolean(review.hasReplied) ? 'text-green-600' : 'text-gray-600'
                     }`}>
-                      {review.hasReplied ? (
+                      {parseBoolean(review.hasReplied) ? (
                         <>
                           <Star className="inline w-3 h-3 mr-1" />
                           Replied {formatRelativeTime(review.createdAt!)}
@@ -134,7 +134,7 @@ export default function AIInsights() {
                   </div>
                 )}
                 
-                {!review.hasReplied && (
+                {!parseBoolean(review.hasReplied) && (
                   <div className="flex space-x-2">
                     <Button 
                       size="sm" 
@@ -181,7 +181,7 @@ export default function AIInsights() {
                     </p>
                   </div>
                   <div className="flex items-center space-x-2">
-                    {reservation.isVip && (
+                    {parseBoolean(reservation.isVip) && (
                       <Badge className="bg-blue-100 text-blue-700">
                         VIP Guest
                       </Badge>
@@ -192,7 +192,7 @@ export default function AIInsights() {
                         Previous No-Show
                       </Badge>
                     )}
-                    {!reservation.isVip && (reservation.noShowCount ?? 0) === 0 && (
+                    {!parseBoolean(reservation.isVip) && (reservation.noShowCount ?? 0) === 0 && (
                       <Badge className="bg-green-100 text-green-700">
                         Confirmed
                       </Badge>

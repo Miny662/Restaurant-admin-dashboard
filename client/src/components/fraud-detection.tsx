@@ -1,6 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { AlertTriangle, Search, CheckCircle } from "lucide-react";
+import { parseJsonArray } from "@/lib/utils";
 import type { Receipt } from "@shared/schema";
 
 export default function FraudDetection() {
@@ -8,7 +9,7 @@ export default function FraudDetection() {
     queryKey: ['/api/receipts'],
   });
 
-  const flaggedReceipts = receipts?.filter(r => r.status === 'flagged' || (r.fraudFlags && r.fraudFlags.length > 0)) || [];
+  const flaggedReceipts = receipts?.filter(r => r.status === 'flagged' || parseJsonArray(r.fraudFlags).length > 0) || [];
   const riskLevels = flaggedReceipts.map(receipt => {
     const trustScore = receipt.trustScore || 0;
     if (trustScore < 0.5) return 'High';
@@ -77,7 +78,7 @@ export default function FraudDetection() {
                     <div>
                       <p className="font-medium text-gray-900">Receipt #{receipt.id.toString().padStart(4, '0')}</p>
                       <p className="text-sm text-gray-600">
-                        {getIssueDescription(receipt.fraudFlags || [])}
+                        {getIssueDescription(parseJsonArray(receipt.fraudFlags))}
                       </p>
                     </div>
                   </div>

@@ -1,8 +1,11 @@
 import OpenAI from "openai";
 
-const openai = new OpenAI({ 
-  apiKey: process.env.OPENAI_API_KEY || process.env.OPENAI_KEY || "default_key"
-});
+// Only create OpenAI client if API key is available
+const openai = process.env.OPENAI_API_KEY || process.env.OPENAI_KEY 
+  ? new OpenAI({ 
+      apiKey: process.env.OPENAI_API_KEY || process.env.OPENAI_KEY || ""
+    })
+  : null;
 
 export interface ReceiptAnalysisResult {
   merchantName: string | null;
@@ -28,6 +31,10 @@ export interface WeeklySummary {
 
 export async function analyzeReceipt(base64Image: string): Promise<ReceiptAnalysisResult> {
   try {
+    if (!openai) {
+      throw new Error("OpenAI API key not configured");
+    }
+    
     // the newest OpenAI model is "gpt-4o" which was released May 13, 2024. do not change this unless explicitly requested by the user
     const response = await openai.chat.completions.create({
       model: "gpt-4o",
@@ -108,6 +115,10 @@ export async function analyzeReceipt(base64Image: string): Promise<ReceiptAnalys
 
 export async function analyzeReviewSentiment(reviewText: string): Promise<ReviewInsight> {
   try {
+    if (!openai) {
+      throw new Error("OpenAI API key not configured");
+    }
+    
     // the newest OpenAI model is "gpt-4o" which was released May 13, 2024. do not change this unless explicitly requested by the user
     const response = await openai.chat.completions.create({
       model: "gpt-4o",
@@ -187,6 +198,10 @@ export async function analyzeReviewSentiment(reviewText: string): Promise<Review
 
 export async function generateWeeklySummary(reviews: Array<{ rating: number; content: string }>): Promise<WeeklySummary> {
   try {
+    if (!openai) {
+      throw new Error("OpenAI API key not configured");
+    }
+    
     const reviewsText = reviews.map(r => `${r.rating} stars: "${r.content}"`).join("\n");
     
     // the newest OpenAI model is "gpt-4o" which was released May 13, 2024. do not change this unless explicitly requested by the user
@@ -249,6 +264,10 @@ export async function generateWeeklySummary(reviews: Array<{ rating: number; con
 
 export async function generateBookingConfirmation(partySize: number, time: string): Promise<string> {
   try {
+    if (!openai) {
+      throw new Error("OpenAI API key not configured");
+    }
+    
     // the newest OpenAI model is "gpt-4o" which was released May 13, 2024. do not change this unless explicitly requested by the user
     const response = await openai.chat.completions.create({
       model: "gpt-4o",

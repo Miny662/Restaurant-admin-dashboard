@@ -1,61 +1,61 @@
-import { pgTable, text, serial, integer, boolean, timestamp, real, jsonb } from "drizzle-orm/pg-core";
+import { sqliteTable, text, integer, real } from "drizzle-orm/sqlite-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
-export const users = pgTable("users", {
-  id: serial("id").primaryKey(),
+export const users = sqliteTable("users", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
   username: text("username").notNull().unique(),
   password: text("password").notNull(),
 });
 
-export const receipts = pgTable("receipts", {
-  id: serial("id").primaryKey(),
+export const receipts = sqliteTable("receipts", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
   filename: text("filename").notNull(),
   originalName: text("original_name").notNull(),
   merchantName: text("merchant_name"),
   amount: real("amount"),
-  date: timestamp("date"),
-  items: jsonb("items").$type<string[]>(),
+  date: text("date"),
+  items: text("items"), // JSON string
   trustScore: real("trust_score"),
-  fraudFlags: jsonb("fraud_flags").$type<string[]>(),
+  fraudFlags: text("fraud_flags"), // JSON string
   confidence: real("confidence"),
   status: text("status").notNull().default("pending"), // pending, verified, flagged
-  createdAt: timestamp("created_at").defaultNow(),
+  createdAt: text("created_at").default("CURRENT_TIMESTAMP"),
 });
 
-export const reviews = pgTable("reviews", {
-  id: serial("id").primaryKey(),
+export const reviews = sqliteTable("reviews", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
   customerName: text("customer_name").notNull(),
   rating: integer("rating").notNull(),
   content: text("content").notNull(),
   sentiment: text("sentiment"), // positive, negative, neutral
   aiReply: text("ai_reply"),
-  hasReplied: boolean("has_replied").default(false),
-  createdAt: timestamp("created_at").defaultNow(),
+  hasReplied: integer("has_replied").default(0), // 0 = false, 1 = true
+  createdAt: text("created_at").default("CURRENT_TIMESTAMP"),
 });
 
-export const reservations = pgTable("reservations", {
-  id: serial("id").primaryKey(),
+export const reservations = sqliteTable("reservations", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
   customerName: text("customer_name").notNull(),
   email: text("email"),
   phone: text("phone"),
   partySize: integer("party_size").notNull(),
-  date: timestamp("date").notNull(),
+  date: text("date").notNull(),
   time: text("time").notNull(),
   status: text("status").notNull().default("confirmed"), // confirmed, cancelled, no-show, completed
   specialRequests: text("special_requests"),
-  isVip: boolean("is_vip").default(false),
+  isVip: integer("is_vip").default(0), // 0 = false, 1 = true
   noShowCount: integer("no_show_count").default(0),
-  createdAt: timestamp("created_at").defaultNow(),
+  createdAt: text("created_at").default("CURRENT_TIMESTAMP"),
 });
 
-export const responseTemplates = pgTable("response_templates", {
-  id: serial("id").primaryKey(),
+export const responseTemplates = sqliteTable("response_templates", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
   name: text("name").notNull(),
   category: text("category").notNull(), // booking, review, no-show
   template: text("template").notNull(),
-  isActive: boolean("is_active").default(true),
-  createdAt: timestamp("created_at").defaultNow(),
+  isActive: integer("is_active").default(1), // 0 = false, 1 = true
+  createdAt: text("created_at").default("CURRENT_TIMESTAMP"),
 });
 
 // Insert schemas
@@ -79,6 +79,11 @@ export const insertResponseTemplateSchema = createInsertSchema(responseTemplates
   createdAt: true,
 });
 
+export const insertUserSchema = createInsertSchema(users).pick({
+  username: true,
+  password: true,
+});
+
 // Types
 export type InsertUser = z.infer<typeof insertUserSchema>;
 export type User = typeof users.$inferSelect;
@@ -94,8 +99,3 @@ export type Reservation = typeof reservations.$inferSelect;
 
 export type InsertResponseTemplate = z.infer<typeof insertResponseTemplateSchema>;
 export type ResponseTemplate = typeof responseTemplates.$inferSelect;
-
-export const insertUserSchema = createInsertSchema(users).pick({
-  username: true,
-  password: true,
-});

@@ -13,7 +13,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Calendar, Clock, Users, Phone, Mail, Plus, Flag, Crown, CheckCircle, XCircle, AlertTriangle } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
-import { formatDateTime, formatDate, getStatusColor } from "@/lib/utils";
+import { formatDateTime, formatDate, getStatusColor, parseBoolean } from "@/lib/utils";
 import type { Reservation } from "@shared/schema";
 
 export default function Reservations() {
@@ -213,7 +213,7 @@ export default function Reservations() {
                       <div className="flex items-center justify-between mb-2">
                         <h4 className="font-medium text-gray-900">{reservation.customerName}</h4>
                         <div className="flex items-center space-x-1">
-                          {reservation.isVip && (
+                          {parseBoolean(reservation.isVip) && (
                             <Badge className="bg-blue-100 text-blue-700">
                               <Crown className="mr-1 w-3 h-3" />
                               VIP
@@ -409,7 +409,7 @@ export default function Reservations() {
                           <div>
                             <h3 className="font-medium text-gray-900 flex items-center space-x-2">
                               <span>{reservation.customerName}</span>
-                              {reservation.isVip && (
+                              {parseBoolean(reservation.isVip) && (
                                 <Crown className="w-4 h-4 text-blue-600" />
                               )}
                             </h3>

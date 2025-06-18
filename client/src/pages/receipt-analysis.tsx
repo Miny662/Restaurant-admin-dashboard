@@ -5,7 +5,7 @@ import ReceiptUpload from "@/components/receipt-upload";
 import FraudDetection from "@/components/fraud-detection";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { formatCurrency, formatDateTime, getTrustScoreBadgeColor } from "@/lib/utils";
+import { formatCurrency, formatDateTime, getTrustScoreBadgeColor, parseJsonArray } from "@/lib/utils";
 import type { Receipt } from "@shared/schema";
 
 export default function ReceiptAnalysis() {
@@ -90,11 +90,11 @@ export default function ReceiptAnalysis() {
                         </div>
                       </div>
                       
-                      {receipt.items && receipt.items.length > 0 && (
+                      {parseJsonArray(receipt.items).length > 0 && (
                         <div className="mb-3">
                           <p className="text-sm font-medium text-gray-700 mb-1">Items:</p>
                           <div className="flex flex-wrap gap-1">
-                            {receipt.items.map((item, index) => (
+                            {parseJsonArray(receipt.items).map((item, index) => (
                               <Badge key={index} variant="secondary" className="text-xs">
                                 {item}
                               </Badge>
@@ -103,11 +103,11 @@ export default function ReceiptAnalysis() {
                         </div>
                       )}
 
-                      {receipt.fraudFlags && receipt.fraudFlags.length > 0 && (
+                      {parseJsonArray(receipt.fraudFlags).length > 0 && (
                         <div>
                           <p className="text-sm font-medium text-red-700 mb-1">Fraud Flags:</p>
                           <div className="flex flex-wrap gap-1">
-                            {receipt.fraudFlags.map((flag, index) => (
+                            {parseJsonArray(receipt.fraudFlags).map((flag, index) => (
                               <Badge key={index} variant="destructive" className="text-xs">
                                 {flag.replace('_', ' ')}
                               </Badge>

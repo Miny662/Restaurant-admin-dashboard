@@ -18,10 +18,8 @@ export default function Sidebar() {
     <div className="w-64 bg-white shadow-lg border-r border-gray-200">
       <div className="p-6">
         <div className="flex items-center space-x-2">
-          <div className="w-8 h-8 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg flex items-center justify-center">
-            <Heart className="w-4 h-4 text-white" />
-          </div>
-          <span className="text-xl font-bold text-gray-900">logo</span>
+          <img src="../../../logo.png" alt="logo" className="w-[50xp] h-[50px]"/>
+          <span className="text-xl font-bold text-gray-900">Albert Restaurant</span>
         </div>
       </div>
       
@@ -51,7 +49,7 @@ export default function Sidebar() {
       </nav>
 
       <div className="absolute bottom-4 left-4 right-4">
-        <div className="bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg p-4">
+        <div className="bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg p-4 w-[200px]">
           <div className="flex items-center space-x-3">
             <img
               src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&w=40&h=40&fit=crop&crop=face"
