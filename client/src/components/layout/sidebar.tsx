@@ -4,12 +4,12 @@ import { Heart, BarChart3, Receipt, Star, Calendar, ChartLine, Settings } from "
 import logo from "../../assets/logo.png";
 
 const navigation = [
-  { name: "Dashboard", href: "/", icon: BarChart3 },
-  { name: "Receipt Analysis", href: "/receipt-analysis", icon: Receipt },
-  { name: "Review Management", href: "/review-management", icon: Star },
-  { name: "Reservations", href: "/reservations", icon: Calendar },
-  { name: "Analytics", href: "/analytics", icon: ChartLine },
-  { name: "Settings", href: "/settings", icon: Settings },
+  { name: "Dashboard", href: "/admin", icon: BarChart3 },
+  { name: "Receipt Analysis", href: "/admin/receipt-analysis", icon: Receipt },
+  { name: "Review Management", href: "/admin/review-management", icon: Star },
+  { name: "Reservations", href: "/admin/reservations", icon: Calendar },
+  { name: "Analytics", href: "/admin/analytics", icon: ChartLine },
+  { name: "Settings", href: "/admin/settings", icon: Settings },
 ];
 
 export default function Sidebar() {

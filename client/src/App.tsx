@@ -20,6 +20,8 @@ function Router() {
       <Route path="/admin/receipt-analysis" component={ReceiptAnalysis} />
       <Route path="/admin/review-management" component={ReviewManagement} />
       <Route path="/admin/reservations" component={Reservations} />
+      <Route path="/admin/analytics" component={Dashboard} />
+      <Route path="/admin/settings" component={Dashboard} />
       <Route component={NotFound} />
     </Switch>
   );
