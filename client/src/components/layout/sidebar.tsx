@@ -1,7 +1,7 @@
 import { Link, useLocation } from "wouter";
 import { cn } from "@/lib/utils";
 import { Heart, BarChart3, Receipt, Star, Calendar, ChartLine, Settings } from "lucide-react";
-import logo from "../assets/logo.png";
+import logo from "../../assets/logo.png";
 
 const navigation = [
   { name: "Dashboard", href: "/", icon: BarChart3 },
