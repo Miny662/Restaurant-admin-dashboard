@@ -9,8 +9,21 @@ import {
   CheckCircle,
   ArrowRight
 } from "lucide-react";
+import { useLocation } from "wouter";
 
 export default function Landing() {
+  const [, setLocation] = useLocation();
+
+  const handleGetStarted = () => {
+    console.log("Get Started clicked - navigating to /dashboard");
+    setLocation("/dashboard");
+  };
+
+  const handleAdminAccess = () => {
+    console.log("Admin Access clicked - navigating to /admin");
+    setLocation("/admin");
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50">
       {/* Hero Section */}
@@ -25,7 +38,7 @@ export default function Landing() {
           <div className="flex justify-center space-x-4">
             <Button 
               size="lg" 
-              onClick={() => window.location.href = '/dashboard'}
+              onClick={handleGetStarted}
               className="bg-blue-600 hover:bg-blue-700"
             >
               Get Started
@@ -34,7 +47,7 @@ export default function Landing() {
             <Button 
               size="lg" 
               variant="outline"
-              onClick={() => window.location.href = '/admin'}
+              onClick={handleAdminAccess}
             >
               Admin Access
             </Button>
@@ -225,7 +238,7 @@ export default function Landing() {
           </p>
           <Button 
             size="lg" 
-            onClick={() => window.location.href = '/dashboard'}
+            onClick={handleGetStarted}
             className="bg-blue-600 hover:bg-blue-700 text-lg px-8 py-3"
           >
             Start Verifying Receipts

@@ -19,7 +19,7 @@
       "destination": "/api/index.ts"
     },
     {
-      "source": "/(.*)",
+      "source": "/((?!api/).*)",
       "destination": "/dist/public/index.html"
     }
   ]
