@@ -25,6 +25,7 @@ sqlite.exec(`
     trust_score REAL,
     fraud_flags TEXT,
     confidence REAL,
+    trust_factors TEXT,
     status TEXT NOT NULL DEFAULT 'pending',
     created_at TEXT DEFAULT CURRENT_TIMESTAMP
   );
@@ -64,3 +65,11 @@ sqlite.exec(`
     created_at TEXT DEFAULT CURRENT_TIMESTAMP
   );
 `);
+
+// Add trust_factors column if it doesn't exist (migration)
+try {
+  sqlite.exec(`ALTER TABLE receipts ADD COLUMN trust_factors TEXT;`);
+} catch (error) {
+  // Column already exists, ignore error
+  console.log("trust_factors column already exists or migration not needed");
+}

@@ -19,6 +19,7 @@ export const receipts = sqliteTable("receipts", {
   trustScore: real("trust_score"),
   fraudFlags: text("fraud_flags"), // JSON string
   confidence: real("confidence"),
+  trustFactors: text("trust_factors"), // JSON string for detailed trust analysis
   status: text("status").notNull().default("pending"), // pending, verified, flagged
   createdAt: text("created_at").default("CURRENT_TIMESTAMP"),
 });

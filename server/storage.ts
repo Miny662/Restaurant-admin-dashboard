@@ -54,7 +54,7 @@ export class DatabaseStorage implements IStorage {
       const existingReceipts = await db.select().from(receipts).limit(1);
       if (existingReceipts.length > 0) return; // Data already initialized
 
-      // Create demo receipts
+      // Create demo receipts with enhanced trust factors
       const demoReceipts = [
         {
           filename: "starbucks_receipt.jpg",
@@ -66,6 +66,13 @@ export class DatabaseStorage implements IStorage {
           trustScore: 0.98,
           fraudFlags: JSON.stringify([]),
           confidence: 0.98,
+          trustFactors: JSON.stringify({
+            imageQuality: 0.95,
+            dataCompleteness: 0.98,
+            formatConsistency: 0.99,
+            amountReasonableness: 0.97,
+            timestampValidity: 0.99,
+          }),
           status: "verified",
         },
         {
@@ -78,6 +85,13 @@ export class DatabaseStorage implements IStorage {
           trustScore: 0.85,
           fraudFlags: JSON.stringify(["unusual_amount_pattern"]),
           confidence: 0.82,
+          trustFactors: JSON.stringify({
+            imageQuality: 0.88,
+            dataCompleteness: 0.92,
+            formatConsistency: 0.85,
+            amountReasonableness: 0.75,
+            timestampValidity: 0.95,
+          }),
           status: "flagged",
         },
         {
@@ -90,6 +104,13 @@ export class DatabaseStorage implements IStorage {
           trustScore: 0.92,
           fraudFlags: JSON.stringify([]),
           confidence: 0.95,
+          trustFactors: JSON.stringify({
+            imageQuality: 0.90,
+            dataCompleteness: 0.94,
+            formatConsistency: 0.96,
+            amountReasonableness: 0.93,
+            timestampValidity: 0.98,
+          }),
           status: "verified",
         }
       ];
@@ -200,9 +221,21 @@ export class DatabaseStorage implements IStorage {
   }
 
   async createReceipt(insertReceipt: InsertReceipt): Promise<Receipt> {
+    // Ensure trust_factors has a default value if not provided
+    const receiptData = {
+      ...insertReceipt,
+      trustFactors: insertReceipt.trustFactors || JSON.stringify({
+        imageQuality: 0.7,
+        dataCompleteness: 0.7,
+        formatConsistency: 0.7,
+        amountReasonableness: 0.7,
+        timestampValidity: 0.7,
+      })
+    };
+
     const [receipt] = await db
       .insert(receipts)
-      .values(insertReceipt)
+      .values(receiptData)
       .returning();
     return receipt;
   }

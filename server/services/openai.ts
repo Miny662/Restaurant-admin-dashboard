@@ -15,6 +15,13 @@ export interface ReceiptAnalysisResult {
   trustScore: number;
   fraudFlags: string[];
   confidence: number;
+  trustFactors: {
+    imageQuality: number;
+    dataCompleteness: number;
+    formatConsistency: number;
+    amountReasonableness: number;
+    timestampValidity: number;
+  };
 }
 
 export interface ReviewInsight {
@@ -27,6 +34,53 @@ export interface WeeklySummary {
   summary: string;
   positiveHighlights: string[];
   areasForImprovement: string[];
+}
+
+// Enhanced trust score calculation
+function calculateTrustScore(factors: ReceiptAnalysisResult['trustFactors']): number {
+  const weights = {
+    imageQuality: 0.25,
+    dataCompleteness: 0.30,
+    formatConsistency: 0.20,
+    amountReasonableness: 0.15,
+    timestampValidity: 0.10,
+  };
+
+  return Object.entries(factors).reduce((score, [factor, value]) => {
+    return score + (value * weights[factor as keyof typeof weights]);
+  }, 0);
+}
+
+// Enhanced fraud detection logic
+function detectFraudFlags(factors: ReceiptAnalysisResult['trustFactors'], amount: number | null): string[] {
+  const flags: string[] = [];
+
+  if (factors.imageQuality < 0.6) {
+    flags.push('poor_image_quality');
+  }
+
+  if (factors.dataCompleteness < 0.7) {
+    flags.push('missing_critical_info');
+  }
+
+  if (factors.formatConsistency < 0.8) {
+    flags.push('inconsistent_formatting');
+  }
+
+  if (amount && (amount > 1000 || amount < 0.01)) {
+    flags.push('unusual_amount_pattern');
+  }
+
+  if (factors.timestampValidity < 0.8) {
+    flags.push('suspicious_timestamp');
+  }
+
+  // Additional fraud patterns
+  if (amount && amount % 1 === 0 && amount > 100) {
+    flags.push('round_amount_suspicious');
+  }
+
+  return flags;
 }
 
 export async function analyzeReceipt(base64Image: string): Promise<ReceiptAnalysisResult> {
@@ -49,17 +103,22 @@ export async function analyzeReceipt(base64Image: string): Promise<ReceiptAnalys
             "amount": "number or null", 
             "date": "ISO date string or null",
             "items": ["array of item names"],
-            "trustScore": "number between 0-1",
-            "fraudFlags": ["array of fraud indicators"],
+            "trustFactors": {
+              "imageQuality": "number between 0-1 (clarity, resolution, lighting)",
+              "dataCompleteness": "number between 0-1 (presence of merchant, amount, date, items)",
+              "formatConsistency": "number between 0-1 (standard receipt format, layout)",
+              "amountReasonableness": "number between 0-1 (reasonable amount for merchant type)",
+              "timestampValidity": "number between 0-1 (date/time makes sense, not future/past extreme)"
+            },
             "confidence": "number between 0-1"
           }
 
-          Fraud indicators to look for:
-          - duplicate_receipt: Signs of duplication or tampering
-          - unusual_amount_pattern: Amounts that seem manipulated
-          - poor_image_quality: Blurry or suspicious image quality
-          - missing_critical_info: Missing merchant info, dates, or amounts
-          - inconsistent_formatting: Receipt format doesn't match typical patterns`
+          Trust factor guidelines:
+          - imageQuality: 0.9+ for clear, well-lit images; 0.6-0.8 for acceptable; <0.6 for poor
+          - dataCompleteness: 0.9+ for all fields present; 0.7-0.8 for most fields; <0.7 for missing critical info
+          - formatConsistency: 0.9+ for standard format; 0.8-0.9 for minor variations; <0.8 for unusual format
+          - amountReasonableness: 0.9+ for typical amounts; 0.7-0.8 for unusual but possible; <0.7 for suspicious
+          - timestampValidity: 0.9+ for recent, logical dates; 0.8-0.9 for acceptable; <0.8 for suspicious dates`
         },
         {
           role: "user",
@@ -83,14 +142,27 @@ export async function analyzeReceipt(base64Image: string): Promise<ReceiptAnalys
 
     const result = JSON.parse(response.choices[0].message.content || "{}");
     
+    // Calculate trust score from factors
+    const trustFactors = {
+      imageQuality: Math.max(0, Math.min(1, result.trustFactors?.imageQuality || 0.7)),
+      dataCompleteness: Math.max(0, Math.min(1, result.trustFactors?.dataCompleteness || 0.7)),
+      formatConsistency: Math.max(0, Math.min(1, result.trustFactors?.formatConsistency || 0.7)),
+      amountReasonableness: Math.max(0, Math.min(1, result.trustFactors?.amountReasonableness || 0.7)),
+      timestampValidity: Math.max(0, Math.min(1, result.trustFactors?.timestampValidity || 0.7)),
+    };
+
+    const trustScore = calculateTrustScore(trustFactors);
+    const fraudFlags = detectFraudFlags(trustFactors, result.amount);
+    
     return {
       merchantName: result.merchantName,
       amount: result.amount,
       date: result.date ? new Date(result.date) : null,
       items: result.items || [],
-      trustScore: Math.max(0, Math.min(1, result.trustScore || 0)),
-      fraudFlags: result.fraudFlags || [],
-      confidence: Math.max(0, Math.min(1, result.confidence || 0)),
+      trustScore: Math.max(0, Math.min(1, trustScore)),
+      fraudFlags,
+      confidence: Math.max(0, Math.min(1, result.confidence || 0.8)),
+      trustFactors,
     };
   } catch (error) {
     console.error("Receipt analysis failed:", error);
@@ -101,14 +173,27 @@ export async function analyzeReceipt(base64Image: string): Promise<ReceiptAnalys
     const randomMerchant = merchantNames[Math.floor(Math.random() * merchantNames.length)];
     const randomAmount = Math.floor(Math.random() * 50) + 5;
     
+    // Simulated trust factors
+    const trustFactors = {
+      imageQuality: 0.75,
+      dataCompleteness: 0.80,
+      formatConsistency: 0.85,
+      amountReasonableness: 0.90,
+      timestampValidity: 0.95,
+    };
+
+    const trustScore = calculateTrustScore(trustFactors);
+    const fraudFlags = detectFraudFlags(trustFactors, randomAmount);
+    
     return {
       merchantName: randomMerchant,
       amount: randomAmount,
       date: timestamp,
       items: ["Item analysis unavailable"],
-      trustScore: 0.75, // Moderate trust when AI unavailable
-      fraudFlags: ["ai_analysis_unavailable"],
+      trustScore: Math.max(0, Math.min(1, trustScore)),
+      fraudFlags: fraudFlags.length > 0 ? fraudFlags : ["ai_analysis_unavailable"],
       confidence: 0.6,
+      trustFactors,
     };
   }
 }
@@ -158,34 +243,22 @@ export async function analyzeReviewSentiment(reviewText: string): Promise<Review
       confidence: Math.max(0, Math.min(1, result.confidence || 0.8)),
     };
   } catch (error) {
-    console.error("Review analysis failed:", error);
+    console.error("Review sentiment analysis failed:", error);
     
-    // Provide intelligent fallback analysis
-    const lowerText = reviewText.toLowerCase();
+    // Fallback sentiment analysis
+    const text = reviewText.toLowerCase();
     let sentiment = "neutral";
-    let suggestedReply = "Thank you for your feedback!";
+    let suggestedReply = "Thank you for your feedback! We appreciate you taking the time to share your experience with us.";
     
-    // Basic sentiment analysis
-    const positiveWords = ["good", "great", "excellent", "amazing", "love", "perfect", "wonderful", "fantastic", "best"];
-    const negativeWords = ["bad", "terrible", "awful", "horrible", "worst", "hate", "disgusting", "disappointing"];
-    const concernWords = ["slow", "wait", "long", "cold", "overcooked", "undercooked", "expensive", "rude"];
-    
-    const positiveCount = positiveWords.filter(word => lowerText.includes(word)).length;
-    const negativeCount = negativeWords.filter(word => lowerText.includes(word)).length;
-    const concernCount = concernWords.filter(word => lowerText.includes(word)).length;
-    
-    if (positiveCount > negativeCount + concernCount) {
+    if (text.includes("great") || text.includes("excellent") || text.includes("amazing") || text.includes("love")) {
       sentiment = "positive";
-      suggestedReply = "Thank you so much for your wonderful review! We're thrilled you had a great experience with us. We can't wait to welcome you back soon!";
-    } else if (negativeCount > positiveCount || concernCount > 0) {
-      sentiment = negativeCount > positiveCount ? "negative" : "mixed";
-      if (lowerText.includes("wait") || lowerText.includes("slow")) {
-        suggestedReply = "Thank you for your feedback. We sincerely apologize for the wait time and are working to improve our service speed. We'd love to welcome you back for a better experience!";
-      } else if (lowerText.includes("food") && (negativeCount > 0 || concernCount > 0)) {
-        suggestedReply = "Thank you for bringing this to our attention. We take food quality seriously and would love the opportunity to make this right. Please reach out to us directly so we can address your concerns.";
-      } else {
-        suggestedReply = "Thank you for your honest feedback. We appreciate you taking the time to share your experience and will use this to improve our service.";
-      }
+      suggestedReply = "Thank you so much for your wonderful feedback! We're thrilled that you had such a great experience. We look forward to serving you again soon!";
+    } else if (text.includes("bad") || text.includes("terrible") || text.includes("awful") || text.includes("hate")) {
+      sentiment = "negative";
+      suggestedReply = "We sincerely apologize for your disappointing experience. Your feedback is important to us, and we'd like to make this right. Please contact us directly so we can address your concerns.";
+    } else if (text.includes("okay") || text.includes("fine") || text.includes("average")) {
+      sentiment = "mixed";
+      suggestedReply = "Thank you for your honest feedback. We're always working to improve, and your input helps us do better. We hope to exceed your expectations on your next visit.";
     }
     
     return {
@@ -262,31 +335,31 @@ export async function generateWeeklySummary(reviews: Array<{ rating: number; con
   }
 }
 
-export async function generateBookingConfirmation(partySize: number, time: string): Promise<string> {
+export async function generateBookingConfirmation(customerName: string, date: string, time: string, partySize: number): Promise<string> {
   try {
     if (!openai) {
       throw new Error("OpenAI API key not configured");
     }
     
-    // the newest OpenAI model is "gpt-4o" which was released May 13, 2024. do not change this unless explicitly requested by the user
     const response = await openai.chat.completions.create({
       model: "gpt-4o",
       messages: [
         {
           role: "system",
-          content: "You are helping generate warm, classy booking confirmation messages for a restaurant. Keep them professional yet friendly."
+          content: `Generate a warm, professional booking confirmation message for a restaurant reservation.`
         },
         {
           role: "user",
-          content: `Write a warm, classy message confirming a booking for ${partySize} guests at ${time}, and thank them for choosing us.`
+          content: `Generate a booking confirmation for ${customerName} on ${date} at ${time} for ${partySize} people.`
         },
       ],
       max_tokens: 200,
     });
 
-    return response.choices[0].message.content || `Thanks so much for booking with us! We've reserved a table for ${partySize} at ${time}. We look forward to hosting you for a wonderful experience!`;
+    return response.choices[0].message.content || `Dear ${customerName}, your reservation for ${partySize} on ${date} at ${time} has been confirmed. We look forward to serving you!`;
   } catch (error) {
     console.error("Booking confirmation generation failed:", error);
-    return `Thanks so much for booking with us! We've reserved a table for ${partySize} at ${time}. We look forward to hosting you for a wonderful experience!`;
+    
+    return `Dear ${customerName}, your reservation for ${partySize} people on ${date} at ${time} has been confirmed. We look forward to welcoming you to our restaurant!`;
   }
 }

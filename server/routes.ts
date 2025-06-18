@@ -53,6 +53,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         trustScore: analysis.trustScore,
         fraudFlags: analysis.fraudFlags,
         confidence: analysis.confidence,
+        trustFactors: analysis.trustFactors,
         status: analysis.trustScore > 0.8 ? "verified" : analysis.fraudFlags.length > 0 ? "flagged" : "pending",
       };
 
