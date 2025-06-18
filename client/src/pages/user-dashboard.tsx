@@ -28,6 +28,7 @@ import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import { formatCurrency, formatRelativeTime, getTrustScoreBadgeColor, parseJsonArray } from "@/lib/utils";
 import type { Receipt, Review } from "@shared/schema";
+import { useLocation } from "wouter";
 
 export default function UserDashboard() {
   const [uploading, setUploading] = useState(false);
@@ -35,6 +36,7 @@ export default function UserDashboard() {
   const [isReviewDialogOpen, setIsReviewDialogOpen] = useState(false);
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const [, setLocation] = useLocation();
 
   const { data: receipts, isLoading: receiptsLoading } = useQuery<Receipt[]>({
     queryKey: ['/api/receipts'],
@@ -172,7 +174,7 @@ export default function UserDashboard() {
             </div>
             <Button 
               variant="outline" 
-              onClick={() => window.location.href = '/admin'}
+              onClick={() => setLocation('/admin')}
               className="bg-white hover:bg-gray-50"
             >
               Admin Dashboard
