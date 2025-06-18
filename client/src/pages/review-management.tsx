@@ -108,7 +108,7 @@ export default function ReviewManagement() {
     <div className="flex h-screen bg-gray-50">
       <Sidebar />
       
-      <div className="flex-1 overflow-hidden">
+      <div className="flex-1 overflow-auto">
         <Header 
           title="Review Management" 
           subtitle="AI-powered review insights and response suggestions" 

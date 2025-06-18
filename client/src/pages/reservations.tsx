@@ -137,7 +137,7 @@ export default function Reservations() {
     <div className="flex h-screen bg-gray-50">
       <Sidebar />
       
-      <div className="flex-1 overflow-hidden">
+      <div className="flex-1 overflow-auto">
         <Header 
           title="Reservations" 
           subtitle="Manage bookings and track customer history" 
