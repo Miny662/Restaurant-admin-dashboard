@@ -191,11 +191,11 @@ app.post('/api/receipts', upload.single('receipt'), (req, res) => {
       merchantName: analysis.merchantName,
       amount: analysis.amount,
       date: analysis.date,
-      items: analysis.items,
+      items: JSON.stringify(analysis.items),
       trustScore: analysis.trustScore,
-      fraudFlags: analysis.fraudFlags,
+      fraudFlags: JSON.stringify(analysis.fraudFlags),
       confidence: analysis.confidence,
-      trustFactors: analysis.trustFactors,
+      trustFactors: JSON.stringify(analysis.trustFactors),
       status: analysis.trustScore > 0.8 ? "verified" : analysis.fraudFlags.length > 0 ? "flagged" : "pending",
       createdAt: new Date().toISOString()
     };
